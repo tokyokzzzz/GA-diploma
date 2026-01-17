@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Generate AI Schedule - MindCraft{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-lg">
+                <div class="card-header bg-primary text-white py-4">
+                    <h3 class="mb-0">
+                        <i class="bi bi-robot"></i> AI Schedule Generator
+                    </h3>
+                    <p class="mb-0 small opacity-75">Let AI create your optimal 6-month productivity plan</p>
+                </div>
+
+                <div class="card-body p-4">
+                    <form method="post">
+                        {% csrf_token %}
+
+                        <!-- Goal Title -->
+                        <div class="mb-4">
+                            <label for="id_goal_title" class="form-label fw-bold">
+                                <i class="bi bi-target"></i> What's your goal?
+                            </label>
+                            {{ form.goal_title }}
+                            <small class="text-muted">e.g., "Learn Python", "Complete Thesis", "Master Guitar"</small>
+                        </div>
+
+                        <!-- Daily Hours -->
+                        <div class="mb-4">
+                            <label for="id_daily_hours" class="form-label fw-bold">
+                                <i class="bi bi-clock"></i> Daily Time Commitment (hours)
+                            </label>
+                            {{ form.daily_hours }}
+                            <small class="text-muted">How many hours per day can you dedicate?</small>
+                        </div>
+
+                        <!-- Duration -->
+                        <div class="mb-4">
+                            <label for="id_total_months" class="form-label fw-bold">
+                                <i class="bi bi-calendar-range"></i> Total Duration
+                            </label>
+                            {{ form.total_months }}
+                        </div>
+
+                        <!-- Priority -->
+                        <div class="mb-4">
+                            <label for="id_priority" class="form-label fw-bold">
+                                <i class="bi bi-exclamation-triangle"></i> Priority Level (1-10)
+                            </label>
+                            {{ form.priority }}
+                            <small class="text-muted">1 = Low, 5 = Medium, 10 = High</small>
+                        </div>
+
+                        <!-- Start Date -->
+                        <div class="mb-4">
+                            <label for="id_start_date" class="form-label fw-bold">
+                                <i class="bi bi-calendar-check"></i> Start Date
+                            </label>
+                            {{ form.start_date }}
+                        </div>
+
+                        <!-- Preferred Times -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-sun"></i> Preferred Work Times
+                            </label>
+                            {{ form.preferred_times }}
+                        </div>
+
+                        <!-- Algorithm Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-cpu"></i> AI Algorithm
+                            </label>
+                            {{ form.algorithm }}
+                            <div class="alert alert-info mt-2">
+                                <small>
+                                    <strong>Greedy:</strong> Faster, good for simple schedules<br>
+                                    <strong>Genetic:</strong> More optimized, better for complex schedules
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Fixed Schedules Section -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold">
+                                <i class="bi bi-calendar-x"></i> Fixed Schedule Conflicts
+                            </label>
+
+                            {% if fixed_schedules %}
+                            <div class="list-group mb-3">
+                                {% for schedule in fixed_schedules %}
+                                <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>{{ schedule.title }}</strong><br>
+                                        <small class="text-muted">
+                                            {{ schedule.get_day_of_week_display }} •
+                                            {{ schedule.start_time|time:"H:i" }} - {{ schedule.end_time|time:"H:i" }}
+                                        </small>
+                                    </div>
+                                    <a href="{% url 'delete_fixed_schedule' schedule.id %}"
+                                        class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            {% else %}
+                            <p class="text-muted">No fixed schedules added yet</p>
+                            {% endif %}
+
+                            <a href="{% url 'add_fixed_schedule' %}" class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-plus-circle"></i> Add Fixed Schedule
+                            </a>
+                        </div>
+
+                        <!-- Submit Button -->
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-magic"></i> Generate AI Schedule
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Info Card -->
+            <div class="card border-0 shadow-sm mt-4 bg-light">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-info-circle text-primary"></i> How It Works
+                    </h5>
+                    <ol class="mb-0">
+                        <li>AI analyzes your goal, time commitment, and constraints</li>
+                        <li>Generates optimal schedule avoiding your fixed commitments</li>
+                        <li>Distributes tasks using Pomodoro technique (25-min sessions)</li>
+                        <li>Creates 6-month calendar with perfect work-life balance</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,208 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Welcome to MindCraft{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section text-white py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container">
+        <div class="row align-items-center min-vh-75">
+            <div class="col-lg-6">
+                <h1 class="display-3 fw-bold mb-4">
+                    Master Your Time with AI
+                </h1>
+                <p class="lead mb-4">
+                    MindCraft combines intelligent scheduling, Pomodoro technique, and gamification 
+                    to help you achieve your goals faster than ever.
+                </p>
+                <div class="d-flex gap-3">
+                    <a href="{% url 'register' %}" class="btn btn-light btn-lg px-4">
+                        Get Started Free
+                    </a>
+                    <a href="#features" class="btn btn-outline-light btn-lg px-4">
+                        Learn More
+                    </a>
+                </div>
+            </div>
+            <div class="col-lg-6 text-center">
+                <i class="bi bi-robot" style="font-size: 15rem; opacity: 0.2;"></i>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">Why Choose MindCraft?</h2>
+            <p class="lead text-muted">Three powerful systems working together</p>
+        </div>
+        
+        <div class="row g-4">
+            <!-- AI Scheduling -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-primary bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-cpu" style="font-size: 2rem;"></i>
+                        </div>
+                        <h3 class="h4 mb-3">AI-Powered Scheduling</h3>
+                        <p class="text-muted">
+                            Our advanced algorithms (Greedy + Genetic) create optimal 6-month schedules 
+                            that respect your commitments and maximize productivity.
+                        </p>
+                        <ul class="list-unstyled text-start mt-3">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Smart conflict detection</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Priority-based optimization</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Deadline-aware planning</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Pomodoro Technique -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-danger bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-alarm" style="font-size: 2rem;"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Pomodoro Timer</h3>
+                        <p class="text-muted">
+                            Stay focused with 25-minute work sessions followed by strategic breaks. 
+                            Our strict mode ensures you can't stop once you start!
+                        </p>
+                        <ul class="list-unstyled text-start mt-3">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> 25-min focus sessions</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Automatic break timers</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Strict mode (no pause)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Gamification -->
+            <div class="col-md-4">
+                <div class="card h-100 border-0 shadow-sm hover-lift">
+                    <div class="card-body text-center p-4">
+                        <div class="feature-icon bg-warning bg-gradient text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 80px; height: 80px;">
+                            <i class="bi bi-trophy" style="font-size: 2rem;"></i>
+                        </div>
+                        <h3 class="h4 mb-3">Gamification</h3>
+                        <p class="text-muted">
+                            Earn XP, level up, unlock achievements, and compete on the leaderboard. 
+                            Make productivity fun and addictive!
+                        </p>
+                        <ul class="list-unstyled text-start mt-3">
+                            <li><i class="bi bi-check-circle-fill text-success"></i> XP & leveling system</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Achievement badges</li>
+                            <li><i class="bi bi-check-circle-fill text-success"></i> Global leaderboard</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works -->
+<section class="bg-light py-5">
+    <div class="container">
+        <div class="text-center mb-5">
+            <h2 class="display-5 fw-bold">How It Works</h2>
+            <p class="lead text-muted">Get started in 3 simple steps</p>
+        </div>
+        
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        1
+                    </div>
+                    <h4>Set Your Goal</h4>
+                    <p class="text-muted">
+                        Tell us what you want to achieve, how much time you can dedicate, 
+                        and your existing commitments.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        2
+                    </div>
+                    <h4>AI Generates Schedule</h4>
+                    <p class="text-muted">
+                        Our AI creates an optimized 6-month plan with Pomodoro sessions 
+                        perfectly distributed across your available time.
+                    </p>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="text-center">
+                    <div class="step-number bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 60px; height: 60px; font-size: 1.5rem; font-weight: bold;">
+                        3
+                    </div>
+                    <h4>Execute & Level Up</h4>
+                    <p class="text-muted">
+                        Complete Pomodoro sessions, earn XP, unlock achievements, 
+                        and watch your productivity soar!
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Section -->
+<section class="py-5">
+    <div class="container">
+        <div class="row text-center g-4">
+            <div class="col-md-3">
+                <h2 class="display-4 fw-bold text-primary">10K+</h2>
+                <p class="text-muted">Pomodoros Completed</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="display-4 fw-bold text-primary">500+</h2>
+                <p class="text-muted">Active Users</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="display-4 fw-bold text-primary">95%</h2>
+                <p class="text-muted">Goal Achievement Rate</p>
+            </div>
+            <div class="col-md-3">
+                <h2 class="display-4 fw-bold text-primary">4.9★</h2>
+                <p class="text-muted">User Rating</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- CTA Section -->
+<section class="cta-section text-white py-5" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <div class="container text-center">
+        <h2 class="display-4 fw-bold mb-4">Ready to Transform Your Productivity?</h2>
+        <p class="lead mb-4">Join thousands of users achieving their goals with AI-powered scheduling</p>
+        <a href="{% url 'register' %}" class="btn btn-light btn-lg px-5">
+            Start Free Today
+        </a>
+    </div>
+</section>
+
+<style>
+    .hover-lift {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15) !important;
+    }
+    .min-vh-75 {
+        min-height: 75vh;
+    }
+</style>
+{% endblock %}

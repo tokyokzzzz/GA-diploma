@@ -1,0 +1,217 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Calendar - MindCraft{% endblock %}
+
+{% block extra_css %}
+<link href='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.css' rel='stylesheet' />
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="fw-bold">
+                <i class="bi bi-calendar3"></i> My Schedule
+            </h2>
+            <p class="text-muted">AI-generated tasks with Pomodoro sessions</p>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-9">
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-4">
+                    <div id="calendar"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-3">
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 fw-bold">Legend</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-2">
+                        <span class="badge bg-danger">High Priority (8-10)</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-warning">Medium Priority (5-7)</span>
+                    </div>
+                    <div class="mb-2">
+                        <span class="badge bg-success">Low Priority (1-4)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0">
+                    <h5 class="mb-0 fw-bold">Quick Stats</h5>
+                </div>
+                <div class="card-body">
+                    <p class="mb-2">
+                        <strong>Total Tasks:</strong> {{ tasks.count }}
+                    </p>
+                    <p class="mb-2">
+                        <strong>Completed:</strong> {{ tasks|length }} / {{ tasks.count }}
+                    </p>
+                    <p class="mb-0">
+                        <strong>This Week:</strong> 12 Pomodoros
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Task Detail Modal -->
+<div class="modal fade" id="taskModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold" id="taskModalTitle">Task Details</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div id="taskDetails">
+                    <p><strong>Description:</strong> <span id="taskDescription"></span></p>
+                    <p><strong>Scheduled:</strong> <span id="taskScheduled"></span></p>
+                    <p><strong>Priority:</strong> <span id="taskPriority"></span></p>
+                    <p><strong>Pomodoros:</strong> <span id="taskPomodoros"></span></p>
+
+                    <div class="progress mb-3" style="height: 25px;">
+                        <div class="progress-bar" id="taskProgress" role="progressbar"></div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Notes</label>
+                        <textarea class="form-control" id="taskNotes" rows="3"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" id="deleteTaskBtn">
+                    <i class="bi bi-trash"></i> Delete
+                </button>
+                <button type="button" class="btn btn-success" id="completeTaskBtn">
+                    <i class="bi bi-check-circle"></i> Mark Complete
+                </button>
+                <a href="#" class="btn btn-primary" id="startPomodoroBtn">
+                    <i class="bi bi-play-fill"></i> Start Pomodoro
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.9/index.global.min.js'></script>
+<script src="{% static 'js/calendar.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const calendarEl = document.getElementById('calendar');
+
+        // Debug: Log the raw events data
+        console.log('Raw calendar_events:', '{{ calendar_events|escapejs }}');
+
+        try {
+            const events = JSON.parse('{{ calendar_events|escapejs }}');
+            console.log('Parsed events:', events);
+            console.log('Number of events:', events.length);
+
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
+                },
+                events: events,
+                eventClick: function (info) {
+                    const event = info.event;
+                    const taskId = event.id;
+
+                    // Fetch task details
+                    fetch(`/task/${taskId}/`)
+                        .then(response => response.json())
+                        .then(data => {
+                            document.getElementById('taskModalTitle').textContent = data.title;
+                            document.getElementById('taskDescription').textContent = data.description || 'No description';
+                            document.getElementById('taskScheduled').textContent = data.scheduled_time || 'Not scheduled';
+                            document.getElementById('taskPriority').textContent = data.priority;
+                            document.getElementById('taskPomodoros').textContent = `${data.pomodoros_completed} / ${data.pomodoros_needed}`;
+                            document.getElementById('taskNotes').value = data.notes || '';
+
+                            const progress = data.completion_percentage;
+                            const progressBar = document.getElementById('taskProgress');
+                            progressBar.style.width = progress + '%';
+                            progressBar.textContent = progress + '%';
+
+                            document.getElementById('startPomodoroBtn').href = `/pomodoro/${taskId}/`;
+                            document.getElementById('deleteTaskBtn').onclick = () => deleteTask(taskId);
+                            document.getElementById('completeTaskBtn').onclick = () => completeTask(taskId);
+
+                            const modal = new bootstrap.Modal(document.getElementById('taskModal'));
+                            modal.show();
+                        });
+                },
+                height: 'auto',
+                contentHeight: 600
+            });
+
+            calendar.render();
+            console.log('Calendar rendered successfully!');
+        } catch (error) {
+            console.error('Error initializing calendar:', error);
+            calendarEl.innerHTML = `
+                <div class="alert alert-danger">
+                    <h4>Calendar Error</h4>
+                    <p>Failed to load calendar: ${error.message}</p>
+                    <p>Please check the browser console for details.</p>
+                </div>
+            `;
+        }
+    });
+
+    function completeTask(taskId) {
+        fetch(`/task/${taskId}/update/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ action: 'complete' })
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    location.reload();
+                }
+            });
+    }
+
+    function deleteTask(taskId) {
+        if (confirm('Are you sure you want to delete this task?')) {
+            window.location.href = `/task/${taskId}/delete/`;
+        }
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+</script>
+{% endblock %}

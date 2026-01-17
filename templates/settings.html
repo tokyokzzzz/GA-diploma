@@ -1,0 +1,135 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Settings - MindCraft{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="fw-bold mb-4">
+        <i class="bi bi-gear"></i> Settings
+    </h2>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+
+                <!-- Profile Settings -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0 fw-bold">Profile Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Profile Picture</label>
+                            {{ form.profile_picture }}
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Theme Preference</label>
+                            {{ form.theme_preference }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pomodoro Settings -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0 fw-bold">Pomodoro Settings</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Work Duration (min)</label>
+                                {{ form.work_duration }}
+                                <small class="text-muted">15-45 minutes</small>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Short Break (min)</label>
+                                {{ form.short_break }}
+                                <small class="text-muted">3-10 minutes</small>
+                            </div>
+
+                            <div class="col-md-4 mb-3">
+                                <label class="form-label fw-bold">Long Break (min)</label>
+                                {{ form.long_break }}
+                                <small class="text-muted">10-30 minutes</small>
+                            </div>
+                        </div>
+
+                        <div class="form-check">
+                            {{ form.strict_mode }}
+                            <label class="form-check-label" for="id_strict_mode">
+                                <strong>Strict Mode</strong> - Cannot pause/stop timer once started
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Notification Settings -->
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-header bg-white border-0 py-3">
+                        <h5 class="mb-0 fw-bold">Notifications</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Daily Reminder Time</label>
+                            {{ form.daily_reminder_time }}
+                        </div>
+
+                        <div class="form-check mb-2">
+                            {{ form.streak_reminders }}
+                            <label class="form-check-label" for="id_streak_reminders">
+                                Streak Reminders
+                            </label>
+                        </div>
+
+                        <div class="form-check">
+                            {{ form.achievement_notifications }}
+                            <label class="form-check-label" for="id_achievement_notifications">
+                                Achievement Notifications
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-check-circle"></i> Save Settings
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Info Card -->
+            <div class="card border-0 shadow-sm bg-light">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">
+                        <i class="bi bi-info-circle text-primary"></i> Tips
+                    </h5>
+                    <ul class="small mb-0">
+                        <li class="mb-2">Strict mode helps maintain focus by preventing interruptions</li>
+                        <li class="mb-2">Adjust Pomodoro duration based on your concentration ability</li>
+                        <li class="mb-2">Enable notifications to maintain your streak</li>
+                        <li>Dark mode reduces eye strain during long sessions</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    select.form-select,
+    input.form-control {
+        display: block;
+        width: 100%;
+        padding: 0.5rem;
+        border: 1px solid #dee2e6;
+        border-radius: 0.375rem;
+    }
+</style>
+{% endblock %}

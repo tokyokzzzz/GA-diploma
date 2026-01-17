@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Profile - MindCraft{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-4">
+            <!-- Profile Card -->
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body text-center p-4">
+                    {% if profile.profile_picture %}
+                    <img src="{{ profile.profile_picture.url }}" class="rounded-circle mb-3" width="150" height="150"
+                        alt="Profile">
+                    {% else %}
+                    <div class="bg-primary text-white rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                        style="width: 150px; height: 150px; font-size: 4rem;">
+                        {{ user.username|first|upper }}
+                    </div>
+                    {% endif %}
+
+                    <h3 class="fw-bold mb-1">{{ user.username }}</h3>
+                    <p class="text-muted mb-3">{{ user.email }}</p>
+
+                    <div class="mb-3">
+                        <span class="badge bg-primary fs-5 px-3 py-2">Level {{ profile.level }}</span>
+                    </div>
+
+                    <div class="row text-center g-3">
+                        <div class="col-4">
+                            <h4 class="fw-bold mb-0">{{ profile.total_xp }}</h4>
+                            <small class="text-muted">XP</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="fw-bold mb-0">{{ profile.current_streak }}</h4>
+                            <small class="text-muted">Streak</small>
+                        </div>
+                        <div class="col-4">
+                            <h4 class="fw-bold mb-0">{{ profile.longest_streak }}</h4>
+                            <small class="text-muted">Best</small>
+                        </div>
+                    </div>
+
+                    <hr class="my-4">
+
+                    <a href="{% url 'settings' %}" class="btn btn-outline-primary w-100">
+                        <i class="bi bi-gear"></i> Edit Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <!-- Achievements -->
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h4 class="mb-0 fw-bold">
+                        <i class="bi bi-trophy"></i> Achievements
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        {% for achievement in all_achievements %}
+                        <div class="col-md-6">
+                            <div
+                                class="card h-100 {% if achievement.id in earned_achievement_ids %}bg-success text-white{% else %}bg-light{% endif %}">
+                                <div class="card-body">
+                                    <div class="d-flex align-items-center">
+                                        <div class="fs-1 me-3">{{ achievement.badge_icon }}</div>
+                                        <div>
+                                            <h6 class="mb-1 fw-bold">{{ achievement.name }}</h6>
+                                            <p class="small mb-0">{{ achievement.description }}</p>
+                                            <small
+                                                class="{% if achievement.id in earned_achievement_ids %}text-white-50{% else %}text-muted{% endif %}">
+                                                +{{ achievement.xp_reward }} XP
+                                            </small>
+                                        </div>
+                                    </div>
+                                    {% if achievement.id in earned_achievement_ids %}
+                                    <div class="mt-2">
+                                        <i class="bi bi-check-circle-fill"></i> Unlocked
+                                    </div>
+                                    {% else %}
+                                    <div class="mt-2 text-muted">
+                                        <i class="bi bi-lock-fill"></i> Locked
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <div class="col-12 text-center py-5">
+                            <i class="bi bi-trophy text-muted" style="font-size: 3rem;"></i>
+                            <p class="text-muted mt-3">No achievements yet. Start completing Pomodoros!</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

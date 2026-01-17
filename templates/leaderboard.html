@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Leaderboard - MindCraft{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="text-center mb-5">
+        <h1 class="display-4 fw-bold">
+            <i class="bi bi-trophy text-warning"></i> Leaderboard
+        </h1>
+        <p class="lead text-muted">Top performers this month</p>
+    </div>
+
+    <!-- Top 3 Podium -->
+    <div class="row justify-content-center mb-5">
+        {% if leaderboard|length >= 2 %}
+        <div class="col-md-3 order-md-2">
+            <div class="card border-0 shadow-lg bg-warning text-white">
+                <div class="card-body text-center py-4">
+                    <div class="display-1 mb-2">🥇</div>
+                    <h4 class="fw-bold">{{ leaderboard.0.username }}</h4>
+                    <p class="mb-2">{{ leaderboard.0.pomodoro_count }} Pomodoros</p>
+                    <p class="small mb-0">Level {{ leaderboard.0.level }} • {{ leaderboard.0.total_xp }} XP</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if leaderboard|length >= 2 %}
+        <div class="col-md-3 order-md-1 mt-md-4">
+            <div class="card border-0 shadow bg-secondary text-white">
+                <div class="card-body text-center py-4">
+                    <div class="display-3 mb-2">🥈</div>
+                    <h5 class="fw-bold">{{ leaderboard.1.username }}</h5>
+                    <p class="mb-2">{{ leaderboard.1.pomodoro_count }} Pomodoros</p>
+                    <p class="small mb-0">Level {{ leaderboard.1.level }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        {% if leaderboard|length >= 3 %}
+        <div class="col-md-3 order-md-3 mt-md-4">
+            <div class="card border-0 shadow bg-danger text-white">
+                <div class="card-body text-center py-4">
+                    <div class="display-3 mb-2">🥉</div>
+                    <h5 class="fw-bold">{{ leaderboard.2.username }}</h5>
+                    <p class="mb-2">{{ leaderboard.2.pomodoro_count }} Pomodoros</p>
+                    <p class="small mb-0">Level {{ leaderboard.2.level }}</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Full Leaderboard Table -->
+    <div class="card border-0 shadow-sm">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Rank</th>
+                            <th>User</th>
+                            <th>Pomodoros</th>
+                            <th>XP</th>
+                            <th>Level</th>
+                            <th>Streak</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in leaderboard %}
+                        <tr {% if user.is_current_user %}class="table-primary" {% endif %}>
+                            <td class="fw-bold">
+                                {% if user.rank == 1 %}🥇{% elif user.rank == 2 %}🥈{% elif user.rank == 3 %}🥉{% else
+                                %}{{ user.rank }}{% endif %}
+                            </td>
+                            <td>
+                                <strong>{{ user.username }}</strong>
+                                {% if user.is_current_user %}<span class="badge bg-primary ms-2">You</span>{% endif %}
+                            </td>
+                            <td>{{ user.pomodoro_count }}</td>
+                            <td>{{ user.total_xp }}</td>
+                            <td><span class="badge bg-info">Lv {{ user.level }}</span></td>
+                            <td>🔥 {{ user.current_streak }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current User Rank (if not in top 10) -->
+    {% if current_user_rank %}
+    <div class="card border-0 shadow-sm mt-4 bg-light">
+        <div class="card-body">
+            <h5 class="fw-bold mb-3">Your Ranking</h5>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <strong>Rank #{{ current_user_rank.rank }}</strong> •
+                    {{ current_user_rank.pomodoro_count }} Pomodoros
+                </div>
+                <div>
+                    Level {{ current_user_rank.level }} • {{ current_user_rank.total_xp }} XP
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,276 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Pomodoro Timer - MindCraft{% endblock %}
+
+{% block extra_css %}
+<style>
+    body {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        overflow: hidden;
+    }
+
+    .pomodoro-container {
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .timer-circle {
+        width: 300px;
+        height: 300px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        border: 10px solid rgba(255, 255, 255, 0.3);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .timer-display {
+        font-size: 4rem;
+        font-weight: bold;
+        font-family: 'Inter', sans-serif;
+    }
+
+    .progress-ring {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        transform: rotate(-90deg);
+    }
+
+    .progress-ring-circle {
+        transition: stroke-dashoffset 1s linear;
+        stroke: #fff;
+        stroke-width: 10;
+        fill: transparent;
+    }
+
+    .celebration {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        z-index: 9999;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .celebration.active {
+        display: flex;
+    }
+
+    @keyframes confetti {
+        0% {
+            transform: translateY(0) rotate(0deg);
+            opacity: 1;
+        }
+
+        100% {
+            transform: translateY(100vh) rotate(720deg);
+            opacity: 0;
+        }
+    }
+
+    .confetti {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background: #f0f;
+        animation: confetti 3s ease-out forwards;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pomodoro-container">
+    <div class="container text-center">
+        <!-- Task Title -->
+        <h2 class="mb-4 fw-bold">{{ task.title }}</h2>
+        <p class="lead mb-5">🍅 Pomodoro {{ task.pomodoros_completed|add:"1" }} of {{ task.pomodoros_needed }}</p>
+
+        <!-- Timer Circle -->
+        <div class="timer-circle mx-auto mb-5">
+            <svg class="progress-ring" width="320" height="320">
+                <circle class="progress-ring-circle" stroke-dasharray="942.48" stroke-dashoffset="0" r="150" cx="160"
+                    cy="160" />
+            </svg>
+            <div class="timer-display" id="timerDisplay">{{ work_duration }}:00</div>
+        </div>
+
+        <!-- Motivational Quote -->
+        <div class="mb-5">
+            <p class="fst-italic opacity-75" id="motivationalQuote">
+                "The secret of getting ahead is getting started." - Mark Twain
+            </p>
+        </div>
+
+        <!-- Info -->
+        <div class="alert alert-light d-inline-block">
+            <i class="bi bi-info-circle"></i>
+            {% if strict_mode %}
+            <strong>Strict Mode:</strong> Timer cannot be paused. Stay focused!
+            {% else %}
+            You can pause the timer if needed
+            {% endif %}
+        </div>
+
+        <!-- Hidden: Session ID for completion -->
+        <input type="hidden" id="sessionId" value="{{ session.id }}">
+        <input type="hidden" id="workDuration" value="{{ work_duration }}">
+        <input type="hidden" id="shortBreak" value="{{ short_break }}">
+        <input type="hidden" id="longBreak" value="{{ long_break }}">
+        <input type="hidden" id="strictMode" value="{{ strict_mode }}">
+    </div>
+</div>
+
+<!-- Celebration Overlay -->
+<div class="celebration" id="celebration">
+    <div class="text-center text-white">
+        <h1 class="display-1 mb-4">🎉</h1>
+        <h2 class="display-4 fw-bold mb-3">Pomodoro Complete!</h2>
+        <p class="lead mb-4">+<span id="xpEarned">10</span> XP</p>
+        <p class="mb-4">Total XP: <span id="totalXP">0</span> • Level <span id="userLevel">1</span></p>
+        <button class="btn btn-light btn-lg" onclick="finishSession()">
+            Continue
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="{% static 'js/pomodoro.js' %}"></script>
+<script>
+    const workDuration = parseInt(document.getElementById('workDuration').value);
+    const shortBreak = parseInt(document.getElementById('shortBreak').value);
+    const longBreak = parseInt(document.getElementById('longBreak').value);
+    const strictMode = document.getElementById('strictMode').value === 'True';
+    const sessionId = document.getElementById('sessionId').value;
+
+    let timeLeft = workDuration * 60; // Convert to seconds
+    let isBreak = false;
+    let timerInterval;
+
+    const quotes = [
+        "The secret of getting ahead is getting started. - Mark Twain",
+        "Focus is the art of knowing what to ignore. - Unknown",
+        "Productivity is never an accident. - Paul J. Meyer",
+        "The way to get started is to quit talking and begin doing. - Walt Disney",
+        "Don't watch the clock; do what it does. Keep going. - Sam Levenson"
+    ];
+
+    // Start timer immediately
+    startTimer();
+
+    function startTimer() {
+        const circle = document.querySelector('.progress-ring-circle');
+        const circumference = 2 * Math.PI * 150;
+
+        timerInterval = setInterval(() => {
+            timeLeft--;
+
+            // Update display
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timerDisplay').textContent =
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            // Update progress ring
+            const progress = (timeLeft / (workDuration * 60));
+            const offset = circumference * (1 - progress);
+            circle.style.strokeDashoffset = offset;
+
+            // Timer complete
+            if (timeLeft <= 0) {
+                clearInterval(timerInterval);
+                completePomodoroSession();
+            }
+
+            // Change quote every 5 minutes
+            if (timeLeft % 300 === 0) {
+                const randomQuote = quotes[Math.floor(Math.random() * quotes.length)];
+                document.getElementById('motivationalQuote').textContent = randomQuote;
+            }
+        }, 1000);
+    }
+
+    function completePomodoroSession() {
+        // Call API to mark session complete
+        fetch(`/pomodoro/complete/${sessionId}/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show celebration
+                    document.getElementById('xpEarned').textContent = data.xp_earned;
+                    document.getElementById('totalXP').textContent = data.total_xp;
+                    document.getElementById('userLevel').textContent = data.level;
+
+                    showCelebration();
+
+                    // Auto-redirect after 5 seconds
+                    setTimeout(() => {
+                        finishSession();
+                    }, 5000);
+                }
+            });
+    }
+
+    function showCelebration() {
+        const celebration = document.getElementById('celebration');
+        celebration.classList.add('active');
+
+        // Create confetti
+        for (let i = 0; i < 50; i++) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            confetti.style.left = Math.random() * 100 + '%';
+            confetti.style.background = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            confetti.style.animationDelay = Math.random() * 0.5 + 's';
+            celebration.appendChild(confetti);
+        }
+    }
+
+    function finishSession() {
+        window.location.href = '/calendar/';
+    }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    // Prevent page close during session (strict mode)
+    {% if strict_mode %}
+    window.addEventListener('beforeunload', function (e) {
+        e.preventDefault();
+        e.returnValue = '';
+        return 'Are you sure you want to leave? Your Pomodoro session will be lost.';
+    });
+    {% endif %}
+</script>
+{% endblock %}
