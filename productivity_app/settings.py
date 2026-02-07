@@ -61,8 +61,14 @@ WSGI_APPLICATION = 'productivity_app.wsgi.application'
 # Database
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        #'ENGINE': 'django.db.backends.sqlite3',
+        #'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',  # must be exactly this
+        'NAME': 'django',          # your DB name
+        'USER': 'postgres',        # your DB user
+        'PASSWORD': 'your_password', # your DB password
+        'HOST': 'db',              # service name from docker-compose
+        'PORT': '5432',
     }
 }
 

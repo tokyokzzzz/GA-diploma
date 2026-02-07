@@ -406,11 +406,17 @@ def analytics(request):
         total_minutes=Sum('duration_minutes')
     )
     
-    # Most productive time
+    # Most productive time - works with both PostgreSQL and SQLite
+    from django.db import connection
+    from django.db.models import Value, F
+    from django.db.models.functions import Extract
+    
     hour_stats = PomodoroSession.objects.filter(
         user=request.user,
         completed=True
-    ).extra(select={'hour': 'CAST(strftime("%%H", start_time) AS INTEGER)'}).values('hour').annotate(
+    ).annotate(
+        hour=Extract('start_time', 'hour')
+    ).values('hour').annotate(
         count=Count('id')
     ).order_by('-count')
     
