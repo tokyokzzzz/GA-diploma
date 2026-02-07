@@ -1,0 +1,180 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard - MindCraft{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <!-- Welcome Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h1 class="display-5 fw-bold">Welcome back, {{ user.username }}! 👋</h1>
+            <p class="lead text-muted">Level {{ profile.level }} • {{ profile.total_xp }} XP • 🔥 {{ profile.current_streak }} day streak</p>
+        </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="row g-4 mb-4">
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Total Pomodoros</p>
+                            <h3 class="mb-0 fw-bold">{{ total_pomodoros }}</h3>
+                        </div>
+                        <div class="bg-primary bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="bi bi-alarm"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Completed Tasks</p>
+                            <h3 class="mb-0 fw-bold">{{ completed_tasks }}/{{ total_tasks }}</h3>
+                        </div>
+                        <div class="bg-success bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Current Streak</p>
+                            <h3 class="mb-0 fw-bold">{{ profile.current_streak }} days</h3>
+                        </div>
+                        <div class="bg-warning bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="bi bi-fire"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <p class="text-muted mb-1">Your Level</p>
+                            <h3 class="mb-0 fw-bold">{{ profile.level }}</h3>
+                        </div>
+                        <div class="bg-info bg-gradient text-white rounded-circle d-flex align-items-center justify-content-center"
+                            style="width: 50px; height: 50px;">
+                            <i class="bi bi-star"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- XP Progress Bar -->
+    <div class="card border-0 shadow-sm mb-4">
+        <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="fw-bold">Level {{ profile.level }} <span class="badge bg-success">+{{ xp_needed_for_next }}</span></span>
+                <span class="text-muted">{{ profile.total_xp }} / {{ xp_for_next_level }} XP</span>
+            </div>
+            <div class="progress" style="height: 25px;">
+                <div class="progress-bar bg-primary" role="progressbar" style="width: {{ xp_progress }}%;">
+                    {{ xp_progress }}%
+                </div>
+            </div>
+            <small class="text-muted mt-2 d-block">
+                Complete Pomodoro sessions to earn XP and unlock Level {{ profile.level|add:"1" }}
+            </small>
+        </div>
+    </div>
+
+    <!-- Today's Tasks -->
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card border-0 shadow-sm">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">Today's Tasks</h5>
+                </div>
+                <div class="card-body">
+                    {% if today_tasks %}
+                    <div class="list-group list-group-flush">
+                        {% for task in today_tasks %}
+                        <div class="list-group-item border-0 px-0">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ task.title }}</h6>
+                                    <small class="text-muted">
+                                        <i class="bi bi-clock"></i> {{ task.scheduled_time|time:"H:i" }}
+                                        • 🍅 {{ task.pomodoros_needed }} Pomodoros
+                                    </small>
+                                </div>
+                                <a href="{% url 'pomodoro_timer' task.id %}" class="btn btn-primary btn-sm">
+                                    <i class="bi bi-play-fill"></i> Start
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-5">
+                        <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                        <p class="text-muted mt-3">No tasks scheduled for today</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <!-- Quick Actions -->
+            <div class="card border-0 shadow-sm mb-3">
+                <div class="card-header bg-white border-0 py-3">
+                    <h5 class="mb-0 fw-bold">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{% url 'schedule_generator' %}" class="btn btn-primary">
+                            <i class="bi bi-robot"></i> Generate AI Schedule
+                        </a>
+                        <a href="{% url 'calendar' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-calendar3"></i> View Calendar
+                        </a>
+                        <a href="{% url 'analytics' %}" class="btn btn-outline-primary">
+                            <i class="bi bi-graph-up"></i> View Analytics
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- First Time User Guide -->
+            {% if not has_tasks %}
+            <div class="card border-0 shadow-sm bg-primary text-white">
+                <div class="card-body">
+                    <h5 class="fw-bold mb-3">🎯 Get Started</h5>
+                    <p class="small mb-3">
+                        Welcome to MindCraft! Let's create your first AI-powered schedule.
+                    </p>
+                    <a href="{% url 'schedule_generator' %}" class="btn btn-light w-100">
+                        Create Your First Schedule
+                    </a>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
