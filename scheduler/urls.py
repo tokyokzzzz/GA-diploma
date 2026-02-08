@@ -22,6 +22,7 @@ urlpatterns = [
     path('task/<int:task_id>/', views.task_detail, name='task_detail'),
     path('task/<int:task_id>/update/', views.update_task, name='update_task'),
     path('task/<int:task_id>/delete/', views.delete_task, name='delete_task'),
+    path('tasks/clear/', views.clear_all_tasks, name='clear_all_tasks'),
     
     # Pomodoro
     path('pomodoro/<int:task_id>/', views.pomodoro_timer, name='pomodoro_timer'),

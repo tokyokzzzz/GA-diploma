@@ -25,10 +25,27 @@
 <div class="container-fluid py-4">
     <div class="row mb-4">
         <div class="col-12">
-            <h2 class="fw-bold">
-                <i class="bi bi-calendar3"></i> My Schedule
-            </h2>
-            <p class="text-muted">AI-generated tasks with Pomodoro sessions</p>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h2 class="fw-bold">
+                        <i class="bi bi-calendar3"></i> My Schedule
+                    </h2>
+                    <p class="text-muted">AI-generated tasks with Pomodoro sessions</p>
+                </div>
+                <div>
+                    <button class="btn btn-primary me-2" data-bs-toggle="modal" data-bs-target="#generateScheduleModal">
+                        <i class="bi bi-lightning-charge"></i> Generate Schedule
+                    </button>
+                    {% if tasks.count > 0 %}
+                    <form method="post" action="{% url 'clear_all_tasks' %}" style="display: inline;" onsubmit="return confirm('Are you sure you want to clear all tasks? This will delete all {{ tasks.count }} task(s).')">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-outline-danger">
+                            <i class="bi bi-trash"></i> Clear All Tasks
+                        </button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -228,4 +245,60 @@
         return cookieValue;
     }
 </script>
+
+<!-- Generate Schedule Modal -->
+<div class="modal fade" id="generateScheduleModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold">⚡ Generate AI Schedule</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'schedule_generator' %}">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">What's your goal?</label>
+                        <input type="text" class="form-control" name="goal_title" placeholder="e.g., Learn Python" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Hours per day</label>
+                        <input type="number" class="form-control" name="daily_hours" value="2" min="1" max="8" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Duration (months)</label>
+                        <input type="number" class="form-control" name="total_months" value="6" min="1" max="12" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Priority Level</label>
+                        <select class="form-select" name="priority" required>
+                            <option value="high">🔴 High - Maximum tasks per day</option>
+                            <option value="medium" selected>🟡 Medium - Balanced</option>
+                            <option value="low">🟢 Low - Relaxed pace</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Generation Algorithm</label>
+                        <select class="form-select" name="algorithm" required>
+                            <option value="balanced" selected>Balanced - Mix of everything</option>
+                            <option value="progressive">Progressive - Increase difficulty</option>
+                            <option value="sprint">Sprint - Push hard early</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-lightning-charge"></i> Generate Now
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 {% endblock %}

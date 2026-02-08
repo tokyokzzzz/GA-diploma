@@ -315,6 +315,19 @@ def delete_task(request, task_id):
     return redirect('calendar')
 
 
+@login_required
+def clear_all_tasks(request):
+    """Clear all AI-generated tasks for the user."""
+    if request.method == 'POST':
+        # Delete all tasks for the user
+        deleted_count, _ = Task.objects.filter(user=request.user).delete()
+        messages.success(request, f'✨ Cleared {deleted_count} tasks. Ready to generate new ones!')
+        return redirect('calendar')
+    
+    # GET request - redirect to calendar (confirmation is done via JavaScript)
+    return redirect('calendar')
+
+
 # ============================================================================
 # POMODORO TIMER
 # ============================================================================
