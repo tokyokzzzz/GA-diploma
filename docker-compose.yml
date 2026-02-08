@@ -6,7 +6,7 @@ services:
     container_name: django_postgres
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: your_password
+      POSTGRES_PASSWORD: your_password   # <- change this to a strong password
       POSTGRES_DB: django
     ports:
       - "5432:5432"
@@ -16,13 +16,19 @@ services:
 
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: gunicorn productivity_app.wsgi:application --bind 0.0.0.0:8000
     volumes:
-      - .:/code
+      - .:/app
     ports:
       - "8000:8000"
     depends_on:
       - db
+    environment:
+      DB_NAME: django
+      DB_USER: postgres
+      DB_PASSWORD: your_password
+      DB_HOST: db
+    restart: always
 
 volumes:
   postgres_data:
